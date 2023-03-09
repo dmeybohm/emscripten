@@ -1064,6 +1064,12 @@ function createWasm() {
     wasmModule = module;
 #endif
 
+#if USE_ASAN && WASM_WORKERS
+    if (instance.wasmSourceBytes) {
+        wasmOffsetConverter = new WasmOffsetConverter(instance.wasmSourceBytes, module);
+    }
+#endif
+
 #if PTHREADS
     PThread.loadWasmModuleToAllWorkers(() => removeRunDependency('wasm-instantiate'));
 #else // singlethreaded build:

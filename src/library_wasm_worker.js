@@ -136,6 +136,9 @@ mergeInto(LibraryManager.library, {
       'js': Module['mainScriptUrlOrBlob'] || _scriptDir,
       'wasmMemory': wasmMemory,
 #endif
+#if USE_ASAN
+      'wasmSourceBytes': copyBuffer(wasmBinarySourceBytes),
+#endif
       'sb': stackLowestAddress, // sb = stack bottom (lowest stack address, SP points at this when stack is full)
       'sz': stackSize,          // sz = stack size
     });

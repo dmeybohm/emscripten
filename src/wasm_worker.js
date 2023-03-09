@@ -1,3 +1,7 @@
+#if USE_ASAN
+self.wasmSourceBytes = null
+#endif
+
 // N.B. The contents of this file are duplicated in src/library_wasm_worker.js
 // in variable "_wasmWorkerBlobUrl" (where the contents are pre-minified) If
 // doing any changes to this file, be sure to update the contents there too.
@@ -12,7 +16,11 @@ onmessage = function(d) {
 	self.{{{ EXPORT_NAME }}} = d;
 #endif
 #if !MINIMAL_RUNTIME
-	d['instantiateWasm'] = (info, receiveInstance) => { var instance = new WebAssembly.Instance(d['wasm'], info); receiveInstance(instance, d['wasm']); return instance.exports; }
+	d['instantiateWasm'] = (info, receiveInstance) => { var instance = new WebAssembly.Instance(d['wasm'], info); 
+#if USE_ASAN
+    instance.wasmSourceBytes = new Uint8Array(wasmSourceBytes);
+#endif
+    receiveInstance(instance, d['wasm']); return instance.exports; }
 #endif
 	importScripts(d.js);
 #if MODULARIZE
