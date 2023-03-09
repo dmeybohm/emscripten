@@ -12,13 +12,19 @@ onmessage = function(d) {
 	// any desired message handlers from now on.
 	onmessage = null;
 	d = d.data;
+#if USE_ASAN
+    self.wasmSourceBytes = d.wasmSourceBytes;
+#endif
+
 #if !MODULARIZE
 	self.{{{ EXPORT_NAME }}} = d;
 #endif
 #if !MINIMAL_RUNTIME
 	d['instantiateWasm'] = (info, receiveInstance) => { var instance = new WebAssembly.Instance(d['wasm'], info); 
 #if USE_ASAN
-    instance.wasmSourceBytes = new Uint8Array(wasmSourceBytes);
+    if (self.wasmSourceBytes) {        
+        instance.wasmSourceBytes = new Uint8Array(self.wasmSourceBytes);
+    }        
 #endif
     receiveInstance(instance, d['wasm']); return instance.exports; }
 #endif
