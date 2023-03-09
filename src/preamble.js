@@ -72,6 +72,16 @@ var ABORT = false;
 // but only when noExitRuntime is false.
 var EXITSTATUS;
 
+#if USE_ASAN && WASM_WORKERS
+var wasmBinarySourceBytes;
+
+function copyBinaryBuffer(src) {
+  var dst = new ArrayBuffer(src.byteLength);
+  new Uint8Array(dst).set(new Uint8Array(src));
+  return dst;
+}
+#endif
+
 /** @type {function(*, string=)} */
 function assert(condition, text) {
   if (!condition) {
@@ -916,6 +926,9 @@ function instantiateAsync(binary, binaryFile, imports, callback) {
           // pthreads and send them the offsets along with the wasm instance).
 
           clonedResponsePromise.then(function(arrayBufferResult) {
+#if USE_ASAN && WASM_WORKERS
+            wasmBinarySourceBytes = copyBinaryBuffer(arrayBufferResult);
+#endif
             wasmOffsetConverter = new WasmOffsetConverter(new Uint8Array(arrayBufferResult), instantiationResult.module);
             callback(instantiationResult);
           }, function(reason) {
