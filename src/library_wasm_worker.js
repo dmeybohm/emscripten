@@ -137,7 +137,7 @@ mergeInto(LibraryManager.library, {
       'wasmMemory': wasmMemory,
 #endif
 #if USE_ASAN
-      'wasmSourceBytes': copyBuffer(wasmBinarySourceBytes),
+      'wasmSourceBytes': copyBinaryBuffer(wasmBinarySourceBytes),
 #endif
       'sb': stackLowestAddress, // sb = stack bottom (lowest stack address, SP points at this when stack is full)
       'sz': stackSize,          // sz = stack size
